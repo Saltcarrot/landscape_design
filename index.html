@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Онлайн-редактор чертежа ландшафта садового участка</title>
+	<link rel="stylesheet" type="text/css" href="index-style.css">
+	<link rel="stylesheet" type="text/css" href="font/font-awesome-4.7.0/css/font-awesome.min.css">
+    <script type="text/javascript" src="js/fabric.min.js" defer></script>
+	<script type="text/javascript" src="js/fabric.js" defer></script>
+	<script type="text/javascript" src="js/util.js" defer></script>
+	<script type="text/javascript" src="js/backend.js" defer></script>
+	<script type="text/javascript" src="js/form.js" defer></script>
+	<script type="text/javascript" src="js/tools.js" defer></script>
+	<script type="text/javascript" src="js/history.js" defer></script>
+</head>
+<body>
+<header>
+	<nav class="header-top">
+		<ul class="top-menu">
+			<li><a href="http://localhost/wordpress/">Главная</a></li>
+			<li><a href="" class="submenu-link">Статьи</a>
+				<ul class="submenu">
+					<li><a href="http://localhost/wordpress/articles/">Все статьи</a></li>
+					<li><a href="http://localhost/wordpress/garden_design/">Оформление участка</a></li>
+					<li><a href="http://localhost/wordpress/garden_care/">Уход за участком</a></li>
+					<li><a href="http://localhost/wordpress/garden_protection/">Защита участка</a></li>
+					<li><a href="http://localhost/wordpress/create_post/">Создать статью</a></li>
+				</ul>
+			</li>
+			<li><a href="http://localhost/landscape-editor/">Создать чертеж</a></li>
+		</ul>
+	</nav>
+	<div class="header-bottom">
+		<h1>Ландшафтный дизайн</h1>
+	</div>
+</header>
+<div class="form-container">
+	<form class="form" method="post">
+		<h2>Перед началом работы с редактором необходимо указать следующие параметры</h2>
+		<fieldset class="important">
+			<legend align="center">Основные параметры</legend>
+			<div class="form-group">
+				<label for="climate">Климат местности:</label>
+				<select id="climate" name="climate" size="1" required>
+					<option value="Любой" selected>Любой</option>
+				</select>
+			</div>
+			<div>
+				<label for="area-width">Длина участка</label>
+				<input id="area-width" name="area-width" type="number" min="100" max="1000" value="1000">
+			</div>
+			<div>
+				<label for="area-height">Ширина участка</label>
+				<input id="area-height" name="area-height" type="number" min="100" max="1000" value="500">
+			</div>
+		</fieldset>
+		<fieldset class="not-important">
+			<legend align="center">Дополнительные параметры</legend>
+			<div class="form-group">
+				<label for="light">Солнечный свет:</label>
+				<select id="light" name="light" size="1">
+					<option value="Любой" selected>Любой</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="watering">Полив:</label>
+				<select id="watering" name="watering" size="1">
+					<option value="Любой" selected>Любой</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="endurance">Выносливость растений:</label>
+				<select id="endurance" name="endurance" size="1">
+					<option value="Любой" selected>Любой</option>
+				</select>
+			</div>
+			<div class="form-group">
+				<label for="temperature-max">Максимальная температура:</label>
+				<input id="temperature-max" name="temperature-max" type="number" min="0" max="100" step="1">
+			</div>
+			<div class="form-group">
+				<label for="air-humidity-max">Максимальная влажность воздуха:</label>
+				<input id="air-humidity-max" name="air-humidity-max" type="number" min="0" max="100" step="1">
+			</div>
+		</fieldset>
+		<div class="form-btn">
+			<input type="submit" value="Начать редактирование">
+			<input type="reset" value="Сбросить все">
+		</div>
+		<p>Редактор доступен только в десктопной версии сайта</p>
+	</form>
+</div>
+<div class="canvas-block hidden">
+	<div class="canvas-top">
+		<button class="list" title="Вернуться к списку"></button>
+		<button class="hand" title="Выбрать"></button>
+		<button class="delete" title="Удалить"></button>
+		<button class="brush" title="Кисть"></button>
+		<button class="line" title="Линия"></button>
+		<button class="rectangle" title="Прямоугольник"></button>
+		<button class="circle" title="Окружность"></button>
+		<button class="text" title="Текст"></button>
+		<button class="rectangle-pattern" title="Прямоугольник - шаблон"></button>
+		<button class="flower" title="Цветы"></button>
+		<button class="water-flower" title="Водные цветы"></button>
+		<button class="bush" title="Кустарники"></button>
+		<button class="tree" title="Деревья"></button>
+		<button class="pound" title="Водоемы"></button>
+		<button class="undo" title="Отменить действие"></button>
+		<button class="redo" title="Повторить действие"></button>
+		<button class="unselect" title="Отменить выбор"></button>
+		<button class="to-backward" title="На задний план"></button>
+		<button class="to-forward" title="На передний план"></button>
+		<button class="add-shadow" title="Показать тени"></button>
+		<button class="remove-shadow" title="Убрать тени"></button>
+		<button class="add-sun" title="Показать солнце"></button>
+		<button class="remove-sun" title="Убрать солнце"></button>
+		<button class="clear" title="Очистить холст"></button>
+		<button class="save" title="Сохранить изображение"></button>
+	</div>
+	<div class="canvas-middle"></div>
+	<div class="canvas-bottom">
+		<div class="canvas-bottom-left">
+			<button class="action-btn">Нажмите, чтобы отобразить список</button>
+			<div class="list-items hidden">
+				<div class="list-flowers"></div>
+				<div class="list-bushes"></div>
+				<div class="list-trees"></div>
+				<div class="list-water-plants"></div>
+				<div class="list-pounds"></div>
+			</div>
+			<div class="properties hidden">
+				<div class="line-properties">
+					<div>
+						<label for="line-width">Толщина линии</label>
+						<input id="line-width" name="line-width" type="range" min="1" max="100" step="1" value="1">
+						<output name="line-width-val" id="line-width-val">1px</output>
+					</div>
+					<div>
+						<label for="line-color">Цвет линии</label>
+						<input id="line-color" name="line-color" type="color">
+					</div>
+					<div>
+						<label for="line-color-opacity">Прозрачность линии</label>
+						<input id="line-color-opacity" name="line-color-opacity" type="range" min="0" max="1" step="0.1" value="1">
+						<output name="line-color-opacity-val" id="line-color-opacity-val">100%</output>
+					</div>
+				</div>
+				<div class="fill-properties">
+					<div>
+						<label for="fill-color">Цвет заливки</label>
+						<input id="fill-color" name="fill-color" type="color">
+					</div>
+					<div>
+						<label for="fill-color-opacity">Прозрачность заливки</label>
+						<input id="fill-color-opacity" name="fill-color-opacity" type="range" min="0" max="1" step="0.1" value="0">
+						<output name="fill-color-opacity-val" id="fill-color-opacity-val">0%</output>
+					</div>
+				</div>
+				<div class="text-area-input">
+					<div>
+						<label for="text-area" class="text-area-label">Введите текст</label>
+						<textarea id="text-area" name="text-area" cols="30" rows="2" maxlength="50" style="font-size: 20px"></textarea>
+					</div>
+					<div>
+						<label for="text-size">Размер текста</label>
+						<input id="text-size" name="text-size" type="range" min="1" max="100" step="1" value="20">
+						<output name="text-size-val" id="text-size-val">20px</output>
+					</div>
+					<div>
+						<label for="text-color">Цвет текста</label>
+						<input id="text-color" name="text-color" type="color">
+					</div>
+					<div>
+						<label for="text-color-opacity">Прозрачность текста</label>
+						<input id="text-color-opacity" name="text-color-opacity" type="range" min="0" max="1" step="0.1" value="1">
+						<output name="text-color-opacity-val" id="text-color-opacity-val">100%</output>
+					</div>
+					<div class="text-area-btns">
+						<button class="add-text-area" title="Добавить текст" value="Добавить текст">Добавить текст</button>
+						<button class="erase-text-area" title="Очистить поле" value="Очистить поле">Очистить поле</button>
+					</div>
+				</div>
+			</div>
+			<div class="pattern-types hidden">
+				<button class="grass-texture" title="Трава"></button>
+				<button class="ground-texture" title="Земля"></button>
+				<button class="wood-texture" title="Дерево"></button>
+				<button class="tile-texture" title="Плитка и камень"></button>
+			</div>
+		</div>
+		<div class="canvas-bottom-right">
+			<div class="no-one-selected hidden">Нажмите на название объекта, чтобы увидеть его описание, или нажмите на иконку объекта, чтобы добавить его на холст</div>
+			<div class="edit-tip hidden">Выберите объект, чтобы изменить его вид</div>
+			<div class="add-tip hidden">Измените параметры, чтобы добавить объект</div>
+			<div class="object-card hidden">
+				<h3>Object Name</h3>
+				<img class="object-picture" alt="Изображение">
+				<div class="object-properties clearfix">
+					<div class="climate">
+						<img src="img/climate.png" alt="Климат" title="Климат">
+						<p>Субтропический</p>
+					</div>
+					<div class="ground">
+						<img src="img/ground.png" alt="Грунт" title="Грунт">
+						<p>Грунт на основе торфа</p>
+					</div>
+					<div class="water-deep hidden">
+						<img src="img/deep.png" alt="Глубина" title="Глубина">
+						<p>100м</p>
+					</div>
+					<div class="endurance">
+						<img src="img/endurance.png" alt="Выносливость" title="Выносливость">
+						<p>Выносливый</p>
+					</div>
+					<div class="lifetime">
+						<img src="img/life-time.png" alt="Время жизни" title="Время жизни">
+						<p>100 лет</p>
+					</div>
+					<div class="air_humidity">
+						<img src="img/air-humidity.png" alt="Влажность воздуха" title="Влажность воздуха">
+						<p>100%</p>
+					</div>
+					<div class="light">
+						<img src="img/light.png" alt="Требование к солнечному свету" title="Требование к солнечному свету">
+						<p>Рассеянный свет</p>
+					</div>
+					<div class="temperature">
+						<img src="img/temperature.png" alt="Температура" title="Температура">
+						<p>100&deg;C - 100&deg;C</p>
+					</div>
+					<div class="watering">
+						<img src="img/watering.png" alt="Полив" title="Полив">
+						<p>Интенсивный полив</p>
+					</div>
+					<div class="plant-time">
+						<img src="img/plant-time.png" alt="Срок посадки" title="Срок посадки">
+						<p>Середина августа</p>
+					</div>
+					<div class="pit-deep">
+						<img src="img/height.png" alt="Глубина посадки" title="Глубина посадки">
+						<p>100м</p>
+					</div>
+					<div class="pit-radius hidden">
+						<img src="img/width.png" alt="Радиус ямы" title="Радиус ямы">
+						<p>100м</p>
+					</div>
+					<div class="distance hidden">
+						<img src="img/width.png" alt="Расстояние от других деревьев" title="Расстояние от других деревьев">
+						<p>100м</p>
+					</div>
+					<div class="pound-deep hidden">
+						<img src="img/height.png" alt="Глубина" title="Глубина">
+						<p>100м</p>
+					</div>
+					<div class="pound-length hidden">
+						<img src="img/width.png" alt="Длина" title="Длина">
+						<p>100м</p>
+					</div>
+					<div class="pound-width hidden">
+						<img src="img/width.png" alt="Ширина" title="Ширина">
+						<p>100м</p>
+					</div>
+					<div class="pound-water-level hidden">
+						<img src="img/deep.png" alt="Уровень воды" title="Уровень воды">
+						<p>100м</p>
+					</div>
+				</div>
+				<div class="object-card-bottom">
+					<div class="description">
+						<h4>Описание</h4>
+						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sodales sapien eu odio tincidunt mattis. In mattis quam sed nunc rutrum tempus. In hac habitasse platea dictumst. Aliquam id eros eros. Morbi id eros suscipit, maximus risus eget, rutrum mi. Nulla nec sodales tellus. Phasellus iaculis fringilla magna, ultricies vulputate nibh vehicula vel.</p>
+					</div>
+					<div class="remark">
+						<h4>Примечание</h4>
+						<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sodales sapien eu odio tincidunt mattis.</p>
+					</div>
+				</div>
+				<button class="close-card">Закрыть</button>
+			</div>
+			<div class="grass-patterns hidden">
+				<button class="grass one" title="Трава 1"></button>
+				<button class="grass two" title="Трава 2"></button>
+				<button class="grass three" title="Трава 3"></button>
+			</div>
+			<div class="ground-patterns hidden">
+				<button class="ground one" title="Земля 1"></button>
+				<button class="ground two" title="Земля 2"></button>
+				<button class="ground three" title="Земля 3"></button>
+			</div>
+			<div class="wood-patterns hidden">
+				<button class="wood one" title="Дерево 1"></button>
+				<button class="wood two" title="Дерево 2"></button>
+				<button class="wood three" title="Дерево 3"></button>
+			</div>
+			<div class="tile-patterns hidden">
+				<button class="tile one" title="Плитка 1"></button>
+				<button class="tile two" title="Плитка 2"></button>
+				<button class="tile three" title="Плитка 3"></button>
+			</div>
+		</div>
+	</div>
+</div>
+<footer>
+	<div class="columns">
+		<div class="column one">
+			<h3>Статьи</h3>
+			<ul>
+				<li><a>Все статьи</a></li>
+				<li><a>Оформление участка</a></li>
+				<li><a>Уход за участком</a></li>
+				<li><a>Защита участка</a></li>
+			</ul>
+		</div>
+		<div class="column two">
+			<h3>Чертежи</h3>
+			<ul>
+				<li><a>Все чертежи</a></li>
+				<li><a>Создать чертеж</a></li>
+				<li><a>Заказать чертеж</a></li>
+			</ul>
+		</div>
+		<div class="column three"></div>
+	</div>
+</footer>
+</body>
+</html>
